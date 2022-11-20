@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<ctype.h>
 #include<string.h>
 
 typedef struct no{
@@ -68,6 +67,7 @@ void addNoLista(NO* novo){
 void addLista(char letra,int frequencia){
 	NO* novo = malloc(sizeof(NO));
 	novo->letra = letra;
+	strcpy(novo->bin,"");
 	novo->id = localizadorId;
 	novo->frequencia = frequencia;
 	//para que não de erro na arvore e as letras serão folhas então esq e dir é NULL
@@ -166,9 +166,6 @@ void criarArvore(){
 void guardarHuffman(NO* aux ,NO* aux2){
 	//aux: variavel quer irá a percorrer o array
 	//aux2:guarda a variavel inicial que vai guardar o valor binario
-	if(aux->esq == NULL && aux->dir == NULL){
-		printf("%c:",aux->letra);
-	}
 	if(aux->pai != NULL){
 		//guardo o valor binario criado a cada caminho feito
 		//adcionar 2 apenas porque ele espera que seja 2 strings
@@ -183,7 +180,6 @@ void guardarHuffman(NO* aux ,NO* aux2){
 		//ao final o binario gerado vem ao contrario por isso é necessario inverte-lo
 		inverter(aux2->bin);
 	}
-	
 }
 void guardaBin(NO* aux){
 	//percorre o vetor atras das folhas que guardam as letras
@@ -197,7 +193,6 @@ void guardaBin(NO* aux){
     	//manda 2 aux um para percorrer o outro para guardar o binario
     	guardarHuffman(aux,aux);
     	//printa o binario gerado
-    	printf("%s",aux->bin);
     }
 }
 //busca o NO equivalente a letra
@@ -239,6 +234,20 @@ void pegandoArquivo(FILE* arq,char palavra[]){
 		strncat(palavra,auxTexto,1);
 	}
 }
+void pos_ordem(NO* aux){
+	if(aux->esq != NULL){
+		printf("\ntem espaco para esquerda\n");
+    	pos_ordem(aux->esq);
+    }
+    if(aux->dir != NULL){
+		printf("\ntem espaco para a direita\n");
+    	pos_ordem(aux->dir);
+    }
+    if(aux->esq == NULL && aux->dir == NULL){
+    	//escreve o valor binario referente a letra
+    	printf("\nachei uma folha\n");
+    }
+}
 int main(){
 	char palavra[1000] = "";
 	char nomeEntrada[50];
@@ -254,7 +263,7 @@ int main(){
 		FILE* saida = fopen(nomeSaida,"wb");
 		fprintf(saida, "%d",tamLista);
 		escrever_cabecalho(saida);
-		criarArvore();	
+		criarArvore();
 		guardaBin(raiz);
 		escrever_arvore_corpo(entrada,saida);
 		fclose(entrada);
